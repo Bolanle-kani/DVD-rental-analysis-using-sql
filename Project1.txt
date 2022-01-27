@@ -1,0 +1,73 @@
+/* Query 1-query used for first insight*/
+SELECT film_title,
+	category_name,
+	COUNT(rent) AS rental_count
+FROM(SELECT f.title AS film_title,
+	    c.name AS category_name,
+	    r.rental_id AS rent
+      FROM category AS c
+      JOIN film_category AS fc
+      ON c.category_id = fc.category_id
+      JOIN film AS f
+      ON f.film_id = fc.film_id
+      JOIN inventory AS i
+      ON i.film_id = f.film_id
+      JOIN rental AS r
+      ON r.inventory_id = i.inventory_id
+      WHERE c.name in ('Animation', 'Children','Classics', 'Comedy', 'Family', 'Music'))sub   
+GROUP BY 1,2
+ORDER BY category_name, film_title
+
+/* Query 2-query used for second insight*/
+SELECT name,standard_quartile,COUNT(*)
+FROM(SELECT f.title AS title,
+	    c.name AS name,
+	    f.rental_duration AS rental_duration,
+	    NTILE(4) OVER (ORDER BY rental_duration) AS standard_quartile
+     FROM category AS c
+     JOIN film_category AS fc
+     ON c.category_id = fc.category_id
+     JOIN film AS f
+     ON f.film_id = fc.film_id
+     WHERE name in ('Animation', 'Children','Classics', 'Comedy', 'Family', 'Music'))sub
+GROUP BY 1,2
+ORDER BY 1,2
+
+/* Query 3-query used for fourth insight*/
+SELECT DATE_PART('month', r.rental_date) AS Rental_month,
+       DATE_PART('year', r.rental_date) AS Rental_year,
+       s.store_id AS store_id,
+       COUNT(*) AS Count_rentals
+ FROM store AS s
+ JOIN staff AS st
+ ON st.store_id = s.store_id
+ JOIN rental AS r
+ ON r.staff_id = st.staff_id
+ GROUP BY 1,2,3
+ ORDER BY 4 DESC
+
+
+/* Query 4-query used for sixth insight*/
+SELECT T1.full_name AS full_name,
+       T1.pay_mon AS pay_mon,
+       T1.pay_amount AS pay_amount,
+       pay_countpermon
+FROM(SELECT c.first_name || ' ' || c.last_name AS full_name,
+       	    DATE_TRUNC ('month', p.payment_date) AS pay_mon,
+	    COUNT(*) AS pay_countpermon,
+	    SUM(p.amount) AS pay_amount
+     FROM payment AS p
+     JOIN customer AS c
+     ON p.customer_id = c.customer_id
+     GROUP BY 1,2) AS T1
+		
+INNER JOIN (SELECT c.first_name || ' ' || c.last_name AS full_name,
+	    SUM(p.amount) AS pay_amount
+	    FROM payment AS p
+	    JOIN customer AS c
+	    ON p.customer_id = c.customer_id
+	    GROUP BY 1
+	    ORDER BY 2 DESC
+	    LIMIT 10) AS T2
+ON T1.full_name = T2.full_name
+ORDER BY 1,2
