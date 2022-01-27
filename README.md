@@ -14,5 +14,5 @@ The file [Project1.text](https://github.com/Bolanle-kani/Sql-data-analysis/blob/
 The file [Project presentation1.pdf](https://github.com/Bolanle-kani/Sql-data-analysis/blob/main/Project%20presentation1.pdf) contains the visualisation built to showcase the output of the query
 
 
-#Author
+# Author
 Omobolanle Adeyemi
