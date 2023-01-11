@@ -1,4 +1,4 @@
-# Sql-data-analysis
+# DVD-rental-data-analysis
 
 # Project overview
 
